@@ -9,8 +9,7 @@ import Mouse
 -- Model
 
 type alias Model = 
-  {
-    drawActions: List (Int, Int)
+  { drawActions: List (Int, Int)
   , color: Color
   , radius: Float
   }
@@ -30,10 +29,10 @@ type Action
 
 actions: Signal Action
 actions = 
-    let 
-        drag = Signal.map Move mouseDrag
-        click = Signal.map Click clicks
-    in Signal.mergeMany [drag, click]
+  Signal.mergeMany 
+    [ Signal.map Move mouseDrag
+    , Signal.map Click clicks
+    ]
 
 clicks: Signal (Int, Int)
 clicks = Signal.sampleOn Mouse.clicks Mouse.position
@@ -53,7 +52,7 @@ update : Action -> Model -> Model
 update action model =
   case action of
     -- TODO distinct click (draw point) and move (draw path) actions
-    Move pos -> { model | drawActions = pos :: model.drawActions }
+    Move pos  -> { model | drawActions = pos :: model.drawActions }
     Click pos -> { model | drawActions = pos :: model.drawActions }
     
 
