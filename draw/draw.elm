@@ -1,44 +1,50 @@
 module Draw where
 
-import Html exposing (text)
+import Html exposing (Html, text)
 import Color exposing (..)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 import Window
 import Mouse
 
-import Signal.Extra exposing (keepWhen, sampleWhen)
-
 -- Model
 
 color = black
 radius = 2
     
--- TODO Window.dimensions as an Action
-w = 1000
-h = 1000
-
-type alias Model = List (Int, Int)
+type alias Model = 
+  {
+    drawActions: List (Int, Int)
+  , w: Int
+  , h: Int
+  }
 
 initialModel: Model
-initialModel = []
+initialModel = 
+  { drawActions = []
+  -- TODO how to set the initial window dimensions with foldp?
+  , w = 1000
+  , h = 1000 
+  }
 
 -- Update
-type Action = Move (Int, Int) | Click (Int, Int)
+type Action 
+  = Move (Int, Int) 
+  | Click (Int, Int)
+  | Resize (Int, Int)
 
-mouseAction: Signal Action
-mouseAction = 
+actions: Signal Action
+actions = 
     let 
         drag = Signal.map Move mouseDrag
         click = Signal.map Click clicks
-    in Signal.merge drag click
+        resize = Signal.map Resize Window.dimensions
+    in Signal.mergeMany [drag, click, resize]
 
 clicks: Signal (Int, Int)
 clicks = Signal.sampleOn Mouse.clicks Mouse.position
 
 -- Only pass through mouse position where the mouse is down
--- I asked  http://stackoverflow.com/q/33976273/2806996 to see if 
---  there is a neater way of doing it. Answer: not really.
 mouseDrag: Signal (Int, Int)
 mouseDrag = 
   Signal.map2 (,) Mouse.position Mouse.isDown
@@ -46,43 +52,31 @@ mouseDrag =
   |> Signal.map fst
  
 
--- Trying out some SO answers.
--- Signal.Extra.keepWhen is like my mouseDrag, but it filters out Mouse.position
---  updates with sampleOn.
-mouseDrag': Signal (Int, Int)
-mouseDrag' = keepWhen Mouse.isDown (0,0) Mouse.position
-
--- Signal.Extra.sampleWhen is analogous to my mouseDrag function.
-mouseDrag'' : Signal (Int, Int)
-mouseDrag'' = 
-  sampleWhen Mouse.isDown (0, 0) Mouse.position
-
-
 -- Update
 -- Trying to understand what StartApp.Simple does.
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    -- TODO distinct click and move actions
-    -- Really the move action should be a Signal for ((Int, Int), (Int, Int)
-    --  that fires on move completion.
-    Move pos -> pos :: model
-    Click pos -> pos ::model
+    -- TODO distinct click (draw point) and move (draw path) actions
+    Move pos -> { model | drawActions = pos :: model.drawActions }
+    Click pos -> { model | drawActions = pos :: model.drawActions }
+    Resize (w, h) -> { model | w = w, h = h  }
+    
 
 state : Signal Model
-state = Signal.foldp update initialModel mouseAction
+state = Signal.foldp update initialModel actions
   
 -- View
 scene : Model -> Element
-scene model =
+scene { w, h, drawActions } =
   -- TODO interpolate if the pixels are not juxtaposed
   let draw (x, y) = 
     circle radius
     |> filled color
     |> move (toFloat x - toFloat w / 2, toFloat h / 2 - toFloat y)
   in
-    collage 1000 1000  (List.map draw model)
+    collage w h  (List.map draw drawActions)
 
 
 -- Go!
