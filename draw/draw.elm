@@ -7,24 +7,29 @@ import Graphics.Element exposing (..)
 import Window
 import Mouse
 
+import Debug
+
+
 -- Model
 
-color = black
-radius = 2
-    
 type alias Model = 
   {
     drawActions: List (Int, Int)
   , w: Int
   , h: Int
+  , color: Color
+  , radius: Float
   }
 
 initialModel: Model
 initialModel = 
   { drawActions = []
   -- TODO how to set the initial window dimensions with foldp?
+  -- It seems I may need to use a port or Signal.Extra.foldp'
   , w = 1000
   , h = 1000 
+  , color = black
+  , radius = 2
   }
 
 -- Update
@@ -69,7 +74,7 @@ state = Signal.foldp update initialModel actions
   
 -- View
 scene : Model -> Element
-scene { w, h, drawActions } =
+scene { w, h, color, radius, drawActions } =
   -- TODO interpolate if the pixels are not juxtaposed
   let draw (x, y) = 
     circle radius
@@ -81,6 +86,7 @@ scene { w, h, drawActions } =
 
 -- Go!
 
-main : Signal Element
+--main : Signal Element
 main =
+  --Signal.map (\d -> Html.text <| toString d) Window.dimensions
   Signal.map scene state
