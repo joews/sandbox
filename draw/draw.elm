@@ -1,23 +1,16 @@
 module Draw where
 
-import Html exposing (Html, text)
 import Color exposing (..)
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 import Window
 import Mouse
 
-import Signal.Extra
-import Debug
-
-
 -- Model
 
 type alias Model = 
   {
     drawActions: List (Int, Int)
-  , w: Int
-  , h: Int
   , color: Color
   , radius: Float
   }
@@ -25,32 +18,22 @@ type alias Model =
 initialModel: Model
 initialModel = 
   { drawActions = []
-  , w = 1000
-  , h = 1000 
   , color = black
   , radius = 2
   }
 
--- Set model from initial Action state for foldp'
-getInitialModel : Action -> Model
-getInitialModel action = 
-  case action of
-      Resize (w, h) -> { initialModel | w = w, h = h }
-      _ -> initialModel
 
 -- Update
 type Action 
   = Move (Int, Int) 
   | Click (Int, Int)
-  | Resize (Int, Int)
 
 actions: Signal Action
 actions = 
     let 
         drag = Signal.map Move mouseDrag
         click = Signal.map Click clicks
-        resize = Signal.map Resize Window.dimensions
-    in Signal.mergeMany [resize, drag, click]
+    in Signal.mergeMany [drag, click]
 
 clicks: Signal (Int, Int)
 clicks = Signal.sampleOn Mouse.clicks Mouse.position
@@ -72,15 +55,14 @@ update action model =
     -- TODO distinct click (draw point) and move (draw path) actions
     Move pos -> { model | drawActions = pos :: model.drawActions }
     Click pos -> { model | drawActions = pos :: model.drawActions }
-    Resize (w, h) -> { model | w = w, h = h  }
     
 
 state : Signal Model
-state = Signal.Extra.foldp' update getInitialModel actions
+state = Signal.foldp update initialModel actions
   
 -- View
-scene : Model -> Element
-scene { w, h, color, radius, drawActions } =
+scene : Model -> (Int, Int) -> Element
+scene { color, radius, drawActions } (w, h) =
   -- TODO interpolate if the pixels are not juxtaposed
   let draw (x, y) = 
     circle radius
@@ -92,7 +74,6 @@ scene { w, h, color, radius, drawActions } =
 
 -- Go!
 
---main : Signal Element
+main : Signal Element
 main =
-  --Signal.map (\d -> Html.text <| toString d) Window.dimensions
-  Signal.map scene state
+  Signal.map2 scene state Window.dimensions
