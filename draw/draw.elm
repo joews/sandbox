@@ -7,6 +7,7 @@ import Graphics.Element exposing (..)
 import Window
 import Mouse
 
+import Signal.Extra
 import Debug
 
 
@@ -24,13 +25,18 @@ type alias Model =
 initialModel: Model
 initialModel = 
   { drawActions = []
-  -- TODO how to set the initial window dimensions with foldp?
-  -- It seems I may need to use a port or Signal.Extra.foldp'
   , w = 1000
   , h = 1000 
   , color = black
   , radius = 2
   }
+
+-- Set model from initial Action state for foldp'
+getInitialModel : Action -> Model
+getInitialModel action = 
+  case action of
+      Resize (w, h) -> { initialModel | w = w, h = h }
+      _ -> initialModel
 
 -- Update
 type Action 
@@ -44,7 +50,7 @@ actions =
         drag = Signal.map Move mouseDrag
         click = Signal.map Click clicks
         resize = Signal.map Resize Window.dimensions
-    in Signal.mergeMany [drag, click, resize]
+    in Signal.mergeMany [resize, drag, click]
 
 clicks: Signal (Int, Int)
 clicks = Signal.sampleOn Mouse.clicks Mouse.position
@@ -70,7 +76,7 @@ update action model =
     
 
 state : Signal Model
-state = Signal.foldp update initialModel actions
+state = Signal.Extra.foldp' update getInitialModel actions
   
 -- View
 scene : Model -> Element
