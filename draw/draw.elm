@@ -13,23 +13,31 @@ type alias Coords = (Int, Int)
 type alias Model = 
   { drawActions: List Drawing
   , color: Color
-  , radius: Float
+  , weight: Float
   }
 
 initialModel: Model
 initialModel = 
   { drawActions = []
   , color = black
-  , radius = 2
+  , weight = 2
   }
 
 -- Update
+
+-- TODO
+-- MouseUp action should clear the current move state.
 type Action 
   = Move Drawing 
   | Click Drawing
 
+-- TODO Perhaps Path needs to take Maybe Coords, so a path is only
+--  drawn in the case where both ends are present. I'm thinking:
+-- (None, Just Path) -> start state. draw nothing.                            
+-- (Just Path, Just Path) -> If the points are identical, draw a point. Otherwise draw a segment.
 type Drawing
   = Point Coords
+  | Path (Coords, Coords)
 
 actions: Signal Action
 actions = 
@@ -47,12 +55,20 @@ clicks =
 mouseDrag: Signal Drawing
 mouseDrag = 
   Signal.map2 (,) Mouse.position Mouse.isDown
+  --|> Signal.sampleOn Mouse.position
   |> Signal.filter snd ((0, 0), False)
-  |> Signal.map (Point << fst)
- 
+  |> Signal.map fst
+  |> Signal.foldp collectMoves (Path ((0,0), (0,0)))
+
+-- TODO I know that this is always Path - how to we avoid covering
+--  the Point case? Or is it useful for setting up the foldp?
+collectMoves: Coords -> Drawing -> Drawing
+collectMoves coords lastPath =
+  case lastPath of 
+    Path (a, b) -> Path (b, coords)
+    Point a -> Path (a, a)
 
 -- Update
--- Trying to understand what StartApp.Simple does.
 
 update : Action -> Model -> Model
 update action model =
@@ -66,17 +82,34 @@ state : Signal Model
 state = Signal.foldp update initialModel actions
   
 -- View
-scene : Model -> Coords -> Element
-scene { color, radius, drawActions } (w, h) =
-  -- TODO interpolate if the pixels are not juxtaposed
-  let draw drawing =
-    case drawing of
-      Point (x, y) -> 
-        circle radius
-        |> filled color
-        |> move (toFloat x - toFloat w / 2, toFloat h / 2 - toFloat y)
+windowToCollage : Coords -> Coords -> (Float, Float)
+windowToCollage (w, h) (x, y) =
+  (toFloat x - toFloat w / 2, toFloat h / 2 - toFloat y)
+
+lineStyle : Model -> LineStyle
+lineStyle model = 
+  let 
+      style = solid model.color
   in
-    collage w h  (List.map draw drawActions)
+    { style | width = model.weight }
+
+scene : Model -> Coords -> Element
+scene model (w, h) =
+  let 
+      xy = windowToCollage (w, h)
+
+      draw drawing =
+        case drawing of
+          Point p -> 
+            circle (model.weight / 2)
+            |> filled model.color
+            |> move (xy p)
+
+          Path (start, end) ->
+            segment (xy start) (xy end)
+            |> traced (lineStyle model)
+  in
+    collage w h  (List.map draw model.drawActions)
 
 
 -- Go!
