@@ -46,7 +46,11 @@ macro fn {
   }
 }
 
-
+// ::
+// Cons operator
+// This version accepts a scalar or Array RHS
+operator (::) 1 right { $left, $right  }
+  => #{ [$left].concat($right)  }
 
 //
 // Testing
@@ -85,3 +89,6 @@ const f = add1 :>> mul2 :>> mul2
 const g = add1 <<: mul2 <<: mul2;
 console.log(f(2));
 console.log(g(2));
+
+console.log(1 :: 2)
+console.log(1 :: [2, 3, 4, 5])
