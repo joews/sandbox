@@ -7,35 +7,11 @@ const {
   GraphQLSchema
 } = require("graphql");
 
-const users = require("./data/users.json");
+const userSchema = require("./user-schema.js");
+const starWarsSchema = require("./star-wars-schema.js");
 
-
-// GraphQL types
-const UserType = new GraphQLObjectType({
-  name: "User",
-  fields: {
-    id: { type: GraphQLInt },
-    name: { type: GraphQLString }
-  }
-});
-
-// GraphQL schema
-const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: "Query",
-    fields: {
-      user: {
-        type: UserType,
-        args: {
-          id: { type: GraphQLInt }
-        },
-        resolve: (_, args) => {
-          return Promise.resolve(users[args.id]);
-        }
-      }
-    }
-  })
-});
+// const schema = userSchema;
+const schema = starWarsSchema;
 
 express()
   .use("/graphql", graphqlServer({ schema, pretty: true }))
