@@ -1,6 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+//
+// Messy smorgasbord of React components
+//
+
 // Stateful class component
 export class App extends React.Component {
   constructor() {
@@ -20,7 +24,7 @@ export class App extends React.Component {
     };
   }
 
-  // custom event handler
+  // called when any widget changes its text value
   updateWidget(e, childId) {
     const newState = Object.assign({}, this.state, {
       subtitle: `${e.target.value} (edited by widget ${childId})`
@@ -29,6 +33,7 @@ export class App extends React.Component {
     this.setState(newState);
   }
 
+  // Called when any slider updates its value
   updateSlider(e) {
     const color = {
       r: +this.refs.redSlider.refs.input.value,
@@ -36,13 +41,7 @@ export class App extends React.Component {
       b: +this.refs.blueSlider.refs.input.value,
     }
 
-    console.log(color);
-
     const newState = Object.assign({}, this.state, { color });
-
-
-    console.log(newState)
-
     this.setState(newState);
   }
 
@@ -74,10 +73,22 @@ export class App extends React.Component {
         )}
         <hr />
 
-        {/*a component with a ref*/}
+        {/* refs */}
+        <h2>Change the title colour:</h2>
+        R
         <Slider ref="redSlider" value={r} update={this.updateSlider.bind(this)} />
+        <span style={{ color: `rgba(${r}, 0, 0, 1)` }}>({r})</span>
+        <br/>
+
+        G
         <Slider ref="greenSlider" value={g} update={this.updateSlider.bind(this)} />
+        <span style={{ color: `rgba(0, ${g}, 0, 1)` }}>({g})</span>
+        <br/>
+
+        B
         <Slider ref="blueSlider" value={b} update={this.updateSlider.bind(this)} />
+        <span style={{ color: `rgba(0, 0, ${b}, 1)` }}>({b})</span>
+        <br/>
       </div>
     );
   }
