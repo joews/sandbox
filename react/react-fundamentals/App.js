@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 
 // Stateful class component
 export class App extends React.Component {
+
   constructor() {
     super();
 
@@ -20,9 +21,14 @@ export class App extends React.Component {
         r: 0,
         g: 0,
         b: 0
-      }
+      },
+      counterIds: []
     };
   }
+
+  //
+  // Child event handlers
+  //
 
   // called when any widget changes its text value
   updateWidget(e, childId) {
@@ -44,6 +50,23 @@ export class App extends React.Component {
     const newState = Object.assign({}, this.state, { color });
     this.setState(newState);
   }
+
+  addCounter() {
+    const nextId = this.state.counterIds.length + 1;
+    const counterIds = [...this.state.counterIds, nextId];
+    const newState = Object.assign({}, this.state, { counterIds });
+    this.setState(newState);
+  }
+
+  popCounter() {
+    const counterIds = this.state.counterIds.slice(0, -1);
+    const newState = Object.assign({}, this.state, { counterIds });
+    this.setState(newState);
+  }
+
+  //
+  // rendering methods
+  //
 
   render() {
     // Without JSX:
@@ -89,11 +112,32 @@ export class App extends React.Component {
         <Slider ref="blueSlider" value={b} update={this.updateSlider.bind(this)} />
         <span style={{ color: `rgba(0, 0, ${b}, 1)` }}>({b})</span>
         <br/>
+        <hr />
+
+        {/* components and other elements can be nested with child properties  */}
+        <h2>Child properties</h2>
+        <Button>child properties!</Button>
+        <Button>
+          Grr!
+          <TableFlip />
+        </Button>
+
+        {/* lifecycle example */}
+        <h2>Lifecyle</h2>
+        <Button onclick={this.addCounter.bind(this)}>Add counter</Button>
+        <Button onclick={this.popCounter.bind(this)}>Pop counter</Button>
+        <br/>
+
+        {this.state.counterIds.map((id) =>
+          <Counter key={id} id={id}/>
+        )}
+
       </div>
     );
   }
 }
 
+// Prop type hints
 App.propTypes = {
   title: React.PropTypes.string.isRequired
 };
@@ -123,4 +167,66 @@ class Slider extends React.Component {
       />
     );
   }
+}
+
+// A component with child properties (transcluded content)
+const Button = ({ children, onclick }) =>
+  <button onClick={onclick}>{children}</button>;
+
+const TableFlip = () => <span>"(╯°□°）╯︵ ┻━┻"</span>;
+
+// Lifecycle methods kitchen sink
+class Counter extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      value: 0
+    };
+  }
+
+  // Mounting
+  componentWillMount() {
+    console.log(`Counter ${this.props.id} will mount`);
+  }
+
+  componentDidMount() {
+    console.log(`Counter ${this.props.id} mounted`);
+  }
+
+  componentWillUnmount() {
+    console.log(`Counter ${this.props.id} will unmount`);
+  }
+
+  // Updating
+
+  // The component's updates have been flushed to the DOM
+  componentDidUpdate(oldProps, oldState) {
+    console.log(`Counter ${this.props.id} flushed to the DOM`, oldProps, oldState);
+  }
+
+  // New props!
+  componentWillReceiveProps(nextProps) {
+    console.log(`Counter ${this.props.id} will receive props`, nextProps);
+  }
+
+  // Return true if the component should have updates flushed to the DOM.
+  // For avoiding redundant re-renders.
+  shouldComponentUpdate(nextProps, nextState) {
+    // Only render every third increment
+    return nextState.value % 3 == 0;
+  }
+
+  // Event handlers
+  increment() {
+    this.setState({ value: this.state.value + 1 });
+  }
+
+  render() {
+    return (
+      <Button onclick={this.increment.bind(this)}>
+        { this.state.value }
+      </Button>
+    );
+  }
+
 }
