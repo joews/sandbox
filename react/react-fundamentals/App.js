@@ -131,6 +131,11 @@ export class App extends React.Component {
         {this.state.counterIds.map((id) =>
           <Counter key={id} id={id}/>
         )}
+        <hr />
+
+        <h2>Higher-order components</h2>
+        <MixedButton text="Click me!" />
+        <MixedLabel text="Mouse over me!" />
 
       </div>
     );
@@ -228,5 +233,44 @@ class Counter extends React.Component {
       </Button>
     );
   }
-
 }
+
+// Higher-order component
+// A function that takes an original component and returns a decorated form
+// Higher-order components are like mixins, but using composition instead
+//  of inheritance.
+const CountMixin = (Component) => class extends React.Component {
+  constructor() {
+    super();
+    this.update = this.update.bind(this);
+    this.state = { value: 0 };
+  }
+
+  update() {
+    this.setState({ value: this.state.value + 1 })
+  }
+
+  componentWillMount() {
+    console.log("CountMixin-ed component will mount");
+  }
+
+  render() {
+    //* pass through the rest of the properties - the higher-order component doesn't need to know what to expect.
+    return (
+      <Component
+        update={this.update}
+        { ...this.state }
+        { ...this.props }
+      />
+    );
+  }
+}
+
+// A couple of stateless components that use the update mixin
+const MixedButton = CountMixin(({ update, text, value }) =>
+  <button onClick={update}>{text}: {value}</button>
+)
+
+const MixedLabel = CountMixin(({ update, text, value }) =>
+  <label onMouseMove={update}>{text}: {value}</label>
+)
