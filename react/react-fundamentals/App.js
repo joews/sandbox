@@ -162,6 +162,8 @@ const Widget = ({ title, message, update }) =>
 // A component that will be assigned to a ref.
 // Although it's stateless, functional components cannot be refs
 //  so we need to use a class.
+// We could pass in the type, min, max, step as props
+//  to turn this into a generic numeric input component.
 class Slider extends React.Component {
   render() {
     const { value, update } = this.props;
