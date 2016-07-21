@@ -6,18 +6,18 @@ export class App extends React.Component {
     super();
 
     // State belongs to the component
-    // In this example the component controls its own state.
-    // It's sometimes better to store state externally.
+    // This parent contains the root state. It passes
+    //  it down to children as props
     this.state = {
-      title: "Hi from state"
+      subtitle: "Subtitle",
+      messages: ["First!", "Second!"]
     };
   }
 
   // custom event handler
-  update(e) {
-    console.log("hi");
+  update(e, childId) {
     this.setState({
-      title: e.target.value
+      subtitle: `${e.target.value} (${childId})`
     });
   }
 
@@ -30,28 +30,33 @@ export class App extends React.Component {
 
     return (
       <div>
-        <h1 className="title">{this.state.title}</h1>
-        <p>{this.props.message}</p>
-        <input id="title-input" type="text" onChange={this.update.bind(this)} />
+        <h1>{this.props.title}</h1>
+        <p>{this.state.subtitle}</p>
+        {this.state.messages.map((message, i) =>
+          <Widget
+            key={i}
+            message={message}
+            title="Widget the first"
+            update={(e) => this.update(e, i)}
+          />
+        )}
       </div>
     );
   }
 }
 
 App.propTypes = {
-  message: React.PropTypes.string,
-  id: React.PropTypes.number.isRequired
+  title: React.PropTypes.string.isRequired
 };
 
 App.defaultProps = {
-  id: 0
+  title: "Default title!"
 };
 
-// Stateless components
-// Props are passed as the argument
-export const StatelessApp = ({ message }) =>
+const Widget = ({ title, message, update }) =>
   <div>
-    <h1 className="title">Hi stateless function!</h1>
+    <h1 className="title">{title}</h1>
     <p>{message}</p>
-  </div>;
-
+    <label>Change the subtitle:</label>
+    <input id="title-input" type="text" onChange={update} />
+  </div>
