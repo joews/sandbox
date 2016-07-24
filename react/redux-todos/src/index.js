@@ -9,10 +9,9 @@ import './index.css';
 const store = createStore(reducer);
 
 function render() {
-
   // Manually inject the redux store into the root component.
   ReactDOM.render(
-    <TodoList store={store} todos={store.getState()} />,
+    <TodoList store={store} {...store.getState()} />,
     document.getElementById('root')
   );
 }

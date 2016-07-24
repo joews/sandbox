@@ -1,6 +1,11 @@
 // Root reducer
-export default function reduce(state, action) {
-  return reduceTodos(state, action);
+export default function reduce(state = {}, action) {
+  // Manual reducer composition
+  // TODO combineReducers
+  return {
+    todos: reduceTodos(state.todos, action),
+    visibility: reduceVisibility(state.visibility, action)
+  }
 }
 
 // Reducer for an array of Todos
@@ -27,6 +32,15 @@ function reduceTodo(state, action) {
       return (action.id === state.id)
         ? toggleTodo(state)
         : state;
+    default:
+      return state;
+  }
+}
+
+function reduceVisibility(state = "SHOW_ALL", action) {
+  switch(action.type) {
+    case "SET_VISIBILITY_FILTER":
+      return action.filter;
     default:
       return state;
   }
