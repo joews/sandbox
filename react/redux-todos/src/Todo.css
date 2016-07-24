@@ -1,0 +1,7 @@
+.Todo {
+  padding: 5px 0;
+}
+
+.Todo--complete {
+  text-decoration: line-through;
+}
