@@ -1,17 +1,15 @@
-// Root reducer
-export default function reduce(state = {}, action) {
-  // Manual reducer composition
-  // TODO combineReducers
-  return {
-    todos: reduceTodos(state.todos, action),
-    visibility: reduceVisibility(state.visibility, action)
-  }
-}
+import { combineReducers } from "redux";
+
+// It's idiomatic to use shorthand here, but I find the reducer names
+//  clash with useful variable names so I prefer reduceTodos or todosReducer.
+export default combineReducers({
+  todos: reduceTodos,
+  visibility: reduceVisibility
+});
 
 // Reducer for an array of Todos
 // State: Todo[]
-// Delegates to child reducers
-export function reduceTodos(state = [], action) {
+function reduceTodos(state = [], action) {
   switch (action.type) {
     case "ADD_TODO":
       return [...state, reduceTodo(null, action)];
