@@ -1,7 +1,4 @@
-// FIXME
-// * state?
-// * mock API layer?
-let nextTodoId = 1;
+import { v4 as uuid } from "node-uuid";
 
 // Extracting action creators documents all of the actions
 //  in (this part of) the application.
@@ -9,7 +6,7 @@ let nextTodoId = 1;
 export function addTodo(text) {
   return {
     type: "ADD_TODO",
-    id: nextTodoId ++,
+    id: uuid(),
     text
   };
 }

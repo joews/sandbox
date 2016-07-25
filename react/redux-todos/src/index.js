@@ -3,11 +3,10 @@ import ReactDOM from 'react-dom';
 import { Provider } from "react-redux";
 
 import createStore from "./store";
-import reducer from "./reducer";
 import TodoApp from './TodoApp';
 import './index.css';
 
-const store = createStore(reducer);
+const store = createStore();
 
 // Components register themselves with the store,
 //  so we don't need a global render method.
