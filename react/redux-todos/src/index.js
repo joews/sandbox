@@ -9,14 +9,11 @@ import './index.css';
 
 const store = createStore(reducer);
 
-function render() {
-  ReactDOM.render(
-    <Provider store={store}>
-      <TodoApp />
-    </Provider>,
-    document.getElementById('root')
-  );
-}
-
-store.subscribe(render);
-render();
+// Components register themselves with the store,
+//  so we don't need a global render method.
+ReactDOM.render(
+  <Provider store={store}>
+    <TodoApp />
+  </Provider>,
+  document.getElementById('root')
+);
