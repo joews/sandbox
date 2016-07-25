@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from "react-redux";
 
 import createStore from "./store";
 import reducer from "./reducer";
 import TodoApp from './TodoApp';
-import Provider from './Provider';
 import './index.css';
 
 const store = createStore(reducer);

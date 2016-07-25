@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+
 import Link from "./Link";
 
 // Container component: redux-aware. Gets store from context.
@@ -6,46 +8,47 @@ import Link from "./Link";
 //  through the parent hierarchy. This is better encapsulation because
 //  it means that parent components don't need to know which props their
 //  descendents need.
-export default class FilterLink extends React.Component {
-
-  // Because parent components don't have all of the props that
-  //  this component needs. If the parent re-renders we may render
-  //  a version of this component with stale state. Therefore we
-  //  need to subscribe directly to store updates.
-  componentDidMount() {
-    this.unsubscribe = this.context.store.subscribe(() => {
-      // React API method: update component regardless of props or state
-      this.forceUpdate();
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
+class FilterLink extends React.Component {
 
   render() {
-    const { visibility, children } = this.props;
-    const state = this.context.store.getState();
+    const {
+      active,
+      children,
+      onClickLink
+    } = this.props;
 
     return (
       <Link
-        onClick={() => this.onClickLink(visibility)}
-        active={visibility === state.visibility}
+        onClick={onClickLink}
+        active={active}
       >
         {children}
       </Link>
     );
   }
 
-  onClickLink(filter) {
-    this.context.store.dispatch({
-      type: "SET_VISIBILITY_FILTER",
-      filter
-    });
+}
+
+// mapStateToProps gets the Component's own props
+//  as the second argument
+function mapStateToProps(state, ownProps) {
+  const active = state.visibility === ownProps.visibility;
+  return {
+    active
+  };
+}
+
+// mapDispatchToprops also gets the Component's own props
+function mapDispatchToProps(dispatch, ownProps) {
+  return {
+    onClickLink() {
+      dispatch({
+        type: "SET_VISIBILITY_FILTER",
+        filter: ownProps.visibility
+      });
+    }
   }
 }
 
-// Opt-in to context
-FilterLink.contextTypes = {
-  store: React.PropTypes.object
-}
+const wrap = connect(mapStateToProps, mapDispatchToProps);
+export default wrap(FilterLink);

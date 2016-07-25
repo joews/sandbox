@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+
 import "./AddTodo.css";
 
 // FIXME
@@ -7,7 +9,7 @@ let nextTodoId = 1;
 // Mixed container and presentation component
 // Logic is so simple there isn't really a sensible division of effort.
 // Blending is pragmatic.
-const AddTodo = (props, context) => {
+const AddTodo = ({ dispatch }) => {
   // use closure for refs in stateless components
   let input;
 
@@ -16,7 +18,7 @@ const AddTodo = (props, context) => {
       <input ref={node => { input = node; }} />
 
       <button onClick={() => {
-        context.store.dispatch({
+        dispatch({
           type: "ADD_TODO",
           id: nextTodoId ++,
           text: input.value
@@ -30,10 +32,13 @@ const AddTodo = (props, context) => {
   );
 }
 
-// Opt-in to context
-AddTodo.contextTypes = {
-  store: React.PropTypes.object
-}
+// This component does not need state, so mapDispatchToProps is null.
+// This component is really simple, so we can inject `dispatch`
+//  directly. The component can manage its own calls to dispatch.
+// This means the component doesn't have to access context directly.
+// const wrap = connect(() => ({ }), (dispatch) => ({ dispatch }));
 
+// This pattern is common, so it's the default:
+const wrap = connect();
 
-export default AddTodo;
+export default wrap(AddTodo);
