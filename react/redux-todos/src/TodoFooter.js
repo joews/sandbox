@@ -4,8 +4,7 @@ import FilterLink from "./FilterLink";
 import "./TodoFooter.css"
 
 // Presentational component - redux-agnostic
-// Receives store as a prop to pass to children. TODO use context.
-const TodoFooter = ({ store }) => {
+const TodoFooter = () => {
   const links = [
     ["All", "SHOW_ALL"],
     ["Complete", "SHOW_COMPLETE"],
@@ -16,13 +15,7 @@ const TodoFooter = ({ store }) => {
     <footer className="TodoFooter">
       <label>Show: </label>
       {links.map(([label, key]) =>
-        <FilterLink
-          key={key}
-          visibility={key}
-          store={store}
-        >
-          {label}
-        </FilterLink>
+        <FilterLink key={key} visibility={key}>{label}</FilterLink>
       )}
     </footer>
   );

@@ -4,14 +4,16 @@ import ReactDOM from 'react-dom';
 import createStore from "./store";
 import reducer from "./reducer";
 import TodoApp from './TodoApp';
+import Provider from './Provider';
 import './index.css';
 
 const store = createStore(reducer);
 
 function render() {
-  // Manually inject the redux store into the root component.
   ReactDOM.render(
-    <TodoApp store={store} {...store.getState()} />,
+    <Provider store={store}>
+      <TodoApp />
+    </Provider>,
     document.getElementById('root')
   );
 }
