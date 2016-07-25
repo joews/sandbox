@@ -1,18 +1,14 @@
 import React from "react";
 import "./todo.css";
 
-const Todo = ({ store, todo }) =>
+// Presentational component - redux-agnostic
+const Todo = ({ completed, text, onClick }) =>
   <li
     // TODO use the classnames library
-    className={todo.completed ? "Todo Todo--complete" : "Todo"}
-    onClick={() => {
-      store.dispatch({
-        type: "TOGGLE_TODO",
-        id: todo.id
-      })
-    }}
+    className={completed ? "Todo Todo--complete" : "Todo"}
+    onClick={onClick}
   >
-    {todo.text}
+    {text}
   </li>
 
 export default Todo;

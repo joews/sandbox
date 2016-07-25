@@ -1,5 +1,6 @@
 .Todo {
   padding: 5px 0;
+  cursor: pointer;
 }
 
 .Todo--complete {
