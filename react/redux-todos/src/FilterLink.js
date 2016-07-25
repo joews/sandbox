@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import { setVisibilityFilter } from "./actions";
 import Link from "./Link";
 
 // Container component: redux-aware. Gets store from context.
@@ -42,10 +43,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch, ownProps) {
   return {
     onClickLink() {
-      dispatch({
-        type: "SET_VISIBILITY_FILTER",
-        filter: ownProps.visibility
-      });
+      dispatch(setVisibilityFilter(ownProps.visibility));
     }
   }
 }

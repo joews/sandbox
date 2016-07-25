@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import { toggleTodo } from "./actions";
 import TodoList from "./TodoList";
 
 class VisibleTodoList extends React.Component {
@@ -48,7 +49,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     onClickTodo(id) {
-      dispatch({ type: "TOGGLE_TODO", id });
+      dispatch(toggleTodo(id));
     }
   }
 }

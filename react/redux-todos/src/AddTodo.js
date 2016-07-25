@@ -1,10 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import { addTodo } from "./actions";
 import "./AddTodo.css";
-
-// FIXME
-let nextTodoId = 1;
 
 // Mixed container and presentation component
 // Logic is so simple there isn't really a sensible division of effort.
@@ -18,12 +16,7 @@ const AddTodo = ({ dispatch }) => {
       <input ref={node => { input = node; }} />
 
       <button onClick={() => {
-        dispatch({
-          type: "ADD_TODO",
-          id: nextTodoId ++,
-          text: input.value
-        });
-
+        dispatch(addTodo(input.value));
         input.value = "";
       }}>
         Add
