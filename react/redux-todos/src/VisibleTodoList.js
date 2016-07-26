@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { withRouter } from "react-router";
 
 import { toggleTodo } from "./actions";
 import TodoList from "./TodoList";
@@ -40,22 +41,19 @@ function getFilteredTodos(todos, filter) {
 
 
 // Map redux store state to the component props
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state, { params }) {
   return {
-    todos: getFilteredTodos(state.todos, ownProps.filter)
-  }
-}
-
-// Map redux store dispatch function to component props
-function mapDispatchToProps(dispatch) {
-  return {
-    onClickTodo(id) {
-      dispatch(toggleTodo(id));
-    }
+    todos: getFilteredTodos(state.todos, params.filter || 'all')
   }
 }
 
 // connect is curried; it returns a function that decorates the component.
-const wrap = connect(mapStateToProps, mapDispatchToProps);
+// Uses mapDispatchToProps shorthand: if the prop function (onClickTodo)
+//  and action creator (toggleTodo) have matching arguments, we can use an
+//  object to define the mapping.
+const wrap = connect(mapStateToProps, {
+  onClickTodo: toggleTodo
+});
 
-export default wrap(VisibleTodoList);
+// withRouter injects router `params` as a component prop
+export default withRouter(wrap(VisibleTodoList));

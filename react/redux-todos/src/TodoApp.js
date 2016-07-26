@@ -7,10 +7,10 @@ import "./TodoApp.css";
 
 // Top-level component. Children are container components.
 // The `params` prop comes from the react-router Route.
-const TodoApp = ({ params }) =>
+const TodoApp = () =>
   <div className="TodoApp">
     <AddTodo />
-    <VisibleTodoList filter={params.filter || 'all'} />
+    <VisibleTodoList />
     <TodoFooter/>
   </div>
 
