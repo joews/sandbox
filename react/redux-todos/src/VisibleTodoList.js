@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
 import { toggleTodo } from "./actions";
+import { getFilteredTodos } from "./reducer";
 import TodoList from "./TodoList";
 
 class VisibleTodoList extends React.Component {
@@ -11,22 +12,6 @@ class VisibleTodoList extends React.Component {
     return (
       <TodoList todos={todos} onClickTodo={onClickTodo.bind(this)} />
     );
-  }
-}
-
-// Moving getFilteredTodos outside the Component makes it a pure function,
-//  so it's easier to test. This change is necessary to make it work with
-//  mapStateToProps.
-function getFilteredTodos(todos, filter) {
-  switch (filter) {
-    case "all":
-      return todos;
-    case "complete":
-      return todos.filter(todo => todo.completed);
-    case "active":
-      return todos.filter(todo => !todo.completed);
-    default:
-      throw new Error(`Unexpected todos filter: ${filter}`);
   }
 }
 
@@ -43,7 +28,7 @@ function getFilteredTodos(todos, filter) {
 // Map redux store state to the component props
 function mapStateToProps(state, { params }) {
   return {
-    todos: getFilteredTodos(state.todos, params.filter || 'all')
+    todos: getFilteredTodos(state, params.filter || 'all')
   }
 }
 
