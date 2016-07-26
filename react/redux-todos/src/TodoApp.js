@@ -6,10 +6,11 @@ import TodoFooter from "./TodoFooter";
 import "./TodoApp.css";
 
 // Top-level component. Children are container components.
-const TodoApp = () =>
+// The `params` prop comes from the react-router Route.
+const TodoApp = ({ params }) =>
   <div className="TodoApp">
     <AddTodo />
-    <VisibleTodoList />
+    <VisibleTodoList filter={params.filter || 'all'} />
     <TodoFooter/>
   </div>
 

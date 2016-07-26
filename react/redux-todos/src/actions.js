@@ -11,13 +11,6 @@ export function addTodo(text) {
   };
 }
 
-export function setVisibilityFilter(visibility) {
-  return {
-    type: "SET_VISIBILITY_FILTER",
-    filter: visibility
-  };
-}
-
 export function toggleTodo(id) {
   return { type: "TOGGLE_TODO", id };
 }

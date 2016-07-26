@@ -7,7 +7,6 @@ import TodoList from "./TodoList";
 class VisibleTodoList extends React.Component {
   render() {
     const { todos, onClickTodo } = this.props;
-
     return (
       <TodoList todos={todos} onClickTodo={onClickTodo.bind(this)} />
     );
@@ -17,14 +16,16 @@ class VisibleTodoList extends React.Component {
 // Moving getFilteredTodos outside the Component makes it a pure function,
 //  so it's easier to test. This change is necessary to make it work with
 //  mapStateToProps.
-function getFilteredTodos(todos, visibility) {
-  switch (visibility) {
-    case "SHOW_COMPLETE":
+function getFilteredTodos(todos, filter) {
+  switch (filter) {
+    case "all":
+      return todos;
+    case "complete":
       return todos.filter(todo => todo.completed);
-    case "SHOW_INCOMPLETE":
+    case "active":
       return todos.filter(todo => !todo.completed);
     default:
-      return todos;
+      throw new Error(`Unexpected todos filter: ${filter}`);
   }
 }
 
@@ -39,9 +40,9 @@ function getFilteredTodos(todos, visibility) {
 
 
 // Map redux store state to the component props
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
-    todos: getFilteredTodos(state.todos, state.visibility)
+    todos: getFilteredTodos(state.todos, ownProps.filter)
   }
 }
 

@@ -1,0 +1,9 @@
+.FilterLink {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.FilterLink--active {
+  text-decoration: none;
+  color: black;
+}

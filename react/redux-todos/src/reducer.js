@@ -3,8 +3,7 @@ import { combineReducers } from "redux";
 // It's idiomatic to use shorthand here, but I find the reducer names
 //  clash with useful variable names so I prefer reduceTodos or todosReducer.
 export default combineReducers({
-  todos: reduceTodos,
-  visibility: reduceVisibility
+  todos: reduceTodos
 });
 
 // Reducer for an array of Todos
@@ -30,15 +29,6 @@ function reduceTodo(state, action) {
       return (action.id === state.id)
         ? toggleTodo(state)
         : state;
-    default:
-      return state;
-  }
-}
-
-function reduceVisibility(state = "SHOW_ALL", action) {
-  switch(action.type) {
-    case "SET_VISIBILITY_FILTER":
-      return action.filter;
     default:
       return state;
   }
