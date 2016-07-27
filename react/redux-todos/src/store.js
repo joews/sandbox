@@ -1,20 +1,21 @@
-import { createStore } from "redux";
-import throttle from "lodash/throttle";
+import { createStore, applyMiddleware } from "redux";
+import promise from "redux-promise";
+import createLogger from "redux-logger";
 
-import { loadState, saveState } from "./local-storage";
 import reducer from "./reducers";
 
-export default function() {
-  const initialState = loadState();
-  const store = createStore(reducer, initialState);
+export default function configureStore() {
+  const middlewares = [promise];
 
-  store.subscribe(throttle(() => {
-    // Save a subset of state to localStorage
-    const state = store.getState();
-    const stateToSave = { todos: state.todos };
+  if (process.env.NODE_ENV !== 'production') { //eslint-disable-line
+    middlewares.push(createLogger());
+  }
 
-    saveState(stateToSave);
-  }, 500));
+  const store = createStore(
+    reducer,
+    /* persistedStateIfYouUseIt, */
+    applyMiddleware(...middlewares)
+  );
 
   return store;
 }
