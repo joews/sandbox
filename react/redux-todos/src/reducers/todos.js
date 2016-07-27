@@ -17,49 +17,27 @@ function byId(state = {}, action) {
   }
 }
 
-function allIds(state = [], action) {
-  if (action.filter !== "all") {
-    return state;
-  }
-
-  switch (action.type) {
-    case "RECEIVE_TODOS":
-      return action.response.map(t => t.id);
-    default:
+// factory for a reducer that manages an array of todoIds
+//  that match te given filter.
+function createList(filter) {
+  return (state = [], action) => {
+    if (action.filter !== filter) {
       return state;
-  }
-}
+    }
 
-function activeIds(state = [], action) {
-  if (action.filter !== "active") {
-    return state;
-  }
-
-  switch (action.type) {
-    case "RECEIVE_TODOS":
-      return action.response.map(t => t.id);
-    default:
-      return state;
-  }
-}
-
-function completedIds(state = [], action) {
-  if (action.filter !== "complete") {
-    return state;
-  }
-
-  switch (action.type) {
-    case "RECEIVE_TODOS":
-      return action.response.map(t => t.id);
-    default:
-      return state;
+    switch (action.type) {
+      case "RECEIVE_TODOS":
+        return action.response.map(t => t.id);
+      default:
+        return state;
+    }
   }
 }
 
 const idsByFilter = combineReducers({
-  all: allIds,
-  active: activeIds,
-  complete: completedIds
+  all: createList("all"),
+  active: createList("active"),
+  complete: createList("complete")
 })
 
 export default combineReducers({
@@ -78,4 +56,8 @@ export default combineReducers({
 export function getFilteredTodos(state, filter) {
   const ids = state.idsByFilter[filter];
   return ids.map(id => state.byId[id]);
+}
+
+export function getTodo(state, id) {
+  return state.byId[id];
 }
