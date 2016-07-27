@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { Router, Route, browserHistory } from "react-router";
 
 import createStore from "./store";
-import TodoApp from './TodoApp';
+import TodoApp from './components/TodoApp';
 import './index.css';
 
 const store = createStore();

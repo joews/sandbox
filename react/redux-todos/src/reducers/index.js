@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 
-import reduceTodos, * as todos from "./todos-reducer";
+import reduceTodos, * as todos from "./todos";
 
 // It's idiomatic to use shorthand here, but I find the reducer names
 //  clash with useful variable names so I prefer reduceTodos or todosReducer.

@@ -2,8 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
-import { toggleTodo } from "./actions";
-import { getFilteredTodos } from "./reducer";
+import { toggleTodo } from "../actions";
+import { getFilteredTodos } from "../reducers";
 import TodoList from "./TodoList";
 
 class VisibleTodoList extends React.Component {
