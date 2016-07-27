@@ -1,57 +1,81 @@
 import { combineReducers } from "redux";
-import todo from "./todo";
 
 // State: Todo[]
 function byId(state = {}, action) {
   switch (action.type) {
-    case "ADD_TODO":
-    case "TOGGLE_TODO":
-      return {
-        ...state,
-        [action.id]: todo(state[action.id], action)
-      }
+    case "RECEIVE_TODOS":
+      // mutating a shallow clone of state is fine inside
+      //  a reducer, since the function stays pure.
+      const nextState = { ...state };
+      action.response.forEach(t => {
+        nextState[t.id] = t;
+      })
+
+      return nextState;
     default:
       return state;
   }
 }
 
 function allIds(state = [], action) {
+  if (action.filter !== "all") {
+    return state;
+  }
+
   switch (action.type) {
-    case 'ADD_TODO':
-      return [...state, action.id];
+    case "RECEIVE_TODOS":
+      return action.response.map(t => t.id);
     default:
       return state;
   }
 }
 
+function activeIds(state = [], action) {
+  if (action.filter !== "active") {
+    return state;
+  }
+
+  switch (action.type) {
+    case "RECEIVE_TODOS":
+      return action.response.map(t => t.id);
+    default:
+      return state;
+  }
+}
+
+function completedIds(state = [], action) {
+  if (action.filter !== "complete") {
+    return state;
+  }
+
+  switch (action.type) {
+    case "RECEIVE_TODOS":
+      return action.response.map(t => t.id);
+    default:
+      return state;
+  }
+}
+
+const idsByFilter = combineReducers({
+  all: allIds,
+  active: activeIds,
+  complete: completedIds
+})
+
 export default combineReducers({
   byId,
-  allIds
+  idsByFilter
 });
 
 //
 // Selectors
 //
 
-function getAllTodos(state) {
-  return state.allIds.map(id => state.byId[id]);
-}
-
 // getFilteredTodo is a selector: it is tightly coupled to the state
 //  structure, so it's best to keep it with the reducer that controls
 //  that slice of the state tree. If we split up reducers into several files,
 //  it would go with the `todos` reducer.
 export function getFilteredTodos(state, filter) {
-  const allTodos = getAllTodos(state);
-
-  switch (filter) {
-    case "all":
-      return allTodos;
-    case "complete":
-      return allTodos.filter(t => t.completed);
-    case "active":
-      return allTodos.filter(t => !t.completed);
-    default:
-      throw new Error(`Unexpected todos filter: ${filter}`);
-  }
+  const ids = state.idsByFilter[filter];
+  return ids.map(id => state.byId[id]);
 }
