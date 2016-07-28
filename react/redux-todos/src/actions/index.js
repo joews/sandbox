@@ -16,11 +16,24 @@ export function toggleTodo(id) {
   return { type: "TOGGLE_TODO", id };
 }
 
-export function fetchTodos(filter) {
-  return api.fetchTodos(filter)
-    .then(response =>
-      receiveTodos(filter, response)
-    );
+// thunk action:
+// more powerful than a promise for an asyc action,
+// because it works with a chain of many async actions.
+export const fetchTodos = (filter) =>
+  (dispatch) => {
+    dispatch(requestTodos(filter));
+
+    api.fetchTodos(filter)
+      .then(response =>
+        dispatch(receiveTodos(filter, response))
+      );
+  }
+
+function requestTodos(filter) {
+  return {
+    type: "REQUEST_TODOS",
+    filter
+  }
 }
 
 export function receiveTodos(filter, response) {
