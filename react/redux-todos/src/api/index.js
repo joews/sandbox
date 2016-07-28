@@ -24,7 +24,7 @@ const delay = (ms) =>
 
 export const fetchTodos = (filter) =>
   delay(500).then(() => {
-    if (Math.random() < 0.33) {
+    if (Math.random() < 0.2) {
       throw new Error("boom-badda-boom")
     }
 

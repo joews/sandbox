@@ -26,10 +26,25 @@ function createList(filter) {
       case "ADD_TODO_SUCCESS":
         return (filter !== "complete")
           ? [...state, action.response.result]
-          : state
+          : state;
+      case "TOGGLE_TODO_SUCCESS":
+        return handleToggle(state, action)
       default:
         return state;
     }
+  }
+
+  function handleToggle(state, action) {
+    const { result: toggledId, entities } = action.response;
+    const { completed } = entities.todos[toggledId];
+
+    const shouldRemove =
+      (completed && filter === "active") ||
+      (!completed && filter === "complete");
+
+    return shouldRemove
+      ? state.filter(id => id !== toggledId)
+      : state;
   }
 
   const isFetching = (state = false, action) => {

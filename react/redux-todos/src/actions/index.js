@@ -24,14 +24,25 @@ export const addTodo = (text) => (dispatch) =>
       err =>
         dispatch({
           type: "ADD_TODO_FAILURE",
-          message: err.message || "oops "
+          message: err.message || "oops add"
         })
     );
 
 
-export function toggleTodo(id) {
-  return { type: "TOGGLE_TODO", id };
-}
+export const toggleTodo = (id) => (dispatch) =>
+  api.toggleTodo(id)
+    .then(
+      response =>
+        dispatch({
+          type: "TOGGLE_TODO_SUCCESS",
+          response: normalize(response, schema.todo)
+        }),
+      err =>
+        dispatch({
+          type: "TOGGLE_TODO_FAILURE",
+          message: err.message || "oops toggle"
+        })
+    );
 
 // thunk action:
 // more powerful than a promise for an asyc action,
@@ -64,7 +75,7 @@ export const fetchTodos = (filter) =>
           dispatch({
             type: "FETCH_TODOS_FAILURE",
             filter,
-            message: err.message || "Something went wrong!"
+            message: err.message || "oops fetch"
           })
       );
   }

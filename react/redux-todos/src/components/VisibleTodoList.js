@@ -67,7 +67,6 @@ VisibleTodoList.propTypes = {
 
 // Map redux store state to the component props
 const mapStateToProps = (state, { params }) => {
-  debugger
   const filter = params.filter || "all";
   return {
     todos: getFilteredTodos(state, filter),
