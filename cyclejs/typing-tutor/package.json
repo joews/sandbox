@@ -1,0 +1,31 @@
+{
+  "name": "typing-tutor",
+  "version": "1.0.0",
+  "description": "A Cycle.js demo app",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwhitfieldseed/typing-tutor.git"
+  },
+  "keywords": [
+    "cycle.js",
+    "demo"
+  ],
+  "author": "Joe Whitfield-Seed <joeseed86@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwhitfieldseed/typing-tutor/issues"
+  },
+  "homepage": "https://github.com/jwhitfieldseed/typing-tutor#readme",
+  "dependencies": {
+    "@cycle/dom": "^9.4.0",
+    "@cycle/xstream-run": "^3.0.3",
+    "http-server": "^0.9.0",
+    "xstream": "^5.0.6"
+  }
+}
