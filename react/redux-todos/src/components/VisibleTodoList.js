@@ -3,8 +3,9 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router";
 
 import * as actions from "../actions";
-import { getFilteredTodos, getIsFetching } from "../reducers";
+import { getFilteredTodos, getIsFetching, getErrorMessage } from "../reducers";
 import TodoList from "./TodoList";
+import FetchError from "./FetchError";
 
 class VisibleTodoList extends Component {
   componentDidMount() {
@@ -24,15 +25,21 @@ class VisibleTodoList extends Component {
         console.log(`VisibleTodoList fetchData done! do more things here!`);
       })
       .catch(() => {
-        console.error(`VisibleTodoList fetchData failed! handle me pls.`);
+        // Should be unreachable, because the fetchTodos async action
+        //  catches rejections and puts an error message into the state tree.
+        console.error(`VisibleTodoList fetchData failed! handle me better pls.`);
       })
   }
 
   render() {
-    const { toggleTodo, todos, isFetching } = this.props;
+    const { toggleTodo, todos, errorMessage, isFetching } = this.props;
 
     if (isFetching && todos.length === 0) {
       return <p>Loading...</p>
+    }
+
+    if (errorMessage) {
+      return <FetchError message={errorMessage} onRetry={() => this.fetchData()} />
     }
 
     return (
@@ -60,11 +67,13 @@ VisibleTodoList.propTypes = {
 
 // Map redux store state to the component props
 const mapStateToProps = (state, { params }) => {
+  debugger
   const filter = params.filter || "all";
   return {
     todos: getFilteredTodos(state, filter),
     isFetching: getIsFetching(state, filter),
-    filter,
+    errorMessage: getErrorMessage(state, filter),
+    filter
   };
 };
 

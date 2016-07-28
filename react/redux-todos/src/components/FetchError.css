@@ -1,0 +1,7 @@
+.FetchError {
+  color: red;
+}
+
+.FetchError__retry {
+  margin-bottom: 15px;
+}

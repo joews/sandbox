@@ -23,7 +23,11 @@ const delay = (ms) =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 export const fetchTodos = (filter) =>
-  delay(2000).then(() => {
+  delay(500).then(() => {
+    if (Math.random() < 0.33) {
+      throw new Error("boom-badda-boom")
+    }
+
     switch (filter) {
       case 'all':
         return fakeDatabase.todos;

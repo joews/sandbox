@@ -32,25 +32,24 @@ export const fetchTodos = (filter) =>
       return Promise.resolve();
     }
 
-    dispatch(requestTodos(filter));
+    dispatch({
+      type: "FETCH_TODOS_REQUEST",
+      filter
+    });
 
     return api.fetchTodos(filter)
-      .then(response =>
-        dispatch(receiveTodos(filter, response))
+      .then(
+        response =>
+          dispatch({
+            type: "FETCH_TODOS_SUCCESS",
+            filter,
+            response
+          }),
+        err =>
+          dispatch({
+            type: "FETCH_TODOS_FAILURE",
+            filter,
+            message: err.message || "Something went wrong!"
+          })
       );
   }
-
-function requestTodos(filter) {
-  return {
-    type: "REQUEST_TODOS",
-    filter
-  }
-}
-
-export function receiveTodos(filter, response) {
-  return {
-    type: "RECEIVE_TODOS",
-    filter,
-    response
-  }
-}

@@ -3,7 +3,7 @@ import { combineReducers } from "redux";
 // State: Todo[]
 function byId(state = {}, action) {
   switch (action.type) {
-    case "RECEIVE_TODOS":
+    case "FETCH_TODOS_SUCCESS":
       // mutating a shallow clone of state is fine inside
       //  a reducer, since the function stays pure.
       const nextState = { ...state };
@@ -28,7 +28,7 @@ function createList(filter) {
     }
 
     switch (action.type) {
-      case "RECEIVE_TODOS":
+      case "FETCH_TODOS_SUCCESS":
         return action.response.map(t => t.id);
       default:
         return state;
@@ -41,10 +41,27 @@ function createList(filter) {
     }
 
     switch (action.type) {
-      case "REQUEST_TODOS":
+      case "FETCH_TODOS_REQUEST":
         return true;
-      case "RECEIVE_TODOS":
+      case "FETCH_TODOS_SUCCESS":
+      case "FETCH_TODOS_FAILURE":
         return false;
+      default:
+        return state;
+    }
+  }
+
+  const errorMessage = (state = null, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+
+    switch (action.type) {
+      case "FETCH_TODOS_FAILURE":
+        return action.message;
+      case "FETCH_TODOS_SUCCESS":
+      case "FETCH_TODOS_REQUEST":
+        return null;
       default:
         return state;
     }
@@ -52,7 +69,8 @@ function createList(filter) {
 
   return combineReducers({
     ids,
-    isFetching
+    isFetching,
+    errorMessage
   })
 }
 
@@ -90,4 +108,8 @@ export function getTodo(state, id) {
 //  like this.
 export function getIsFetching(state, filter) {
   return state.idsByFilter[filter].isFetching;
+}
+
+export function getErrorMessage(state, filter) {
+  return state.idsByFilter[filter].errorMessage;
 }
