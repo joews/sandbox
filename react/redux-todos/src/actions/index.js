@@ -1,18 +1,33 @@
-import { v4 as uuid } from "node-uuid";
+import { normalize } from "normalizr";
 
+import * as schema from "../api/schema" ;
 import { getIsFetching } from "../reducers";
 import * as api from '../api';
 
 // Extracting action creators documents all of the actions
 //  in (this part of) the application.
 
-export function addTodo(text) {
-  return {
-    type: "ADD_TODO",
-    id: uuid(),
-    text
-  };
-}
+export const addTodo = (text) => (dispatch) =>
+  // TODO add some features
+  // - dispatch ADD_TODO_REQUEST. A Component can use this
+  //   to display a "pending" todo (maybe grey text). We can
+  //   change that to black for success, or remove + display error
+  //   for failure.
+  // - Retry tries to add the same todo.
+  api.addTodo(text)
+    .then(
+      response =>
+        dispatch({
+          type: "ADD_TODO_SUCCESS",
+          response: normalize(response, schema.todo)
+        }),
+      err =>
+        dispatch({
+          type: "ADD_TODO_FAILURE",
+          message: err.message || "oops "
+        })
+    );
+
 
 export function toggleTodo(id) {
   return { type: "TOGGLE_TODO", id };
@@ -43,7 +58,7 @@ export const fetchTodos = (filter) =>
           dispatch({
             type: "FETCH_TODOS_SUCCESS",
             filter,
-            response
+            response: normalize(response, schema.arrayOfTodos)
           }),
         err =>
           dispatch({

@@ -2,19 +2,14 @@ import { combineReducers } from "redux";
 
 // State: Todo[]
 function byId(state = {}, action) {
-  switch (action.type) {
-    case "FETCH_TODOS_SUCCESS":
-      // mutating a shallow clone of state is fine inside
-      //  a reducer, since the function stays pure.
-      const nextState = { ...state };
-      action.response.forEach(t => {
-        nextState[t.id] = t;
-      })
-
-      return nextState;
-    default:
-      return state;
+  if (action.response) {
+    return {
+      ...state,
+      ...action.response.entities.todos
+    }
   }
+
+  return state;
 }
 
 // factory for a reducer that manages an array of todoIds
@@ -23,13 +18,15 @@ function byId(state = {}, action) {
 // TODO extract to a new module
 function createList(filter) {
   const ids = (state = [], action) => {
-    if (action.filter !== filter) {
-      return state;
-    }
-
     switch (action.type) {
       case "FETCH_TODOS_SUCCESS":
-        return action.response.map(t => t.id);
+        return (filter === action.filter)
+          ? action.response.result
+          : state;
+      case "ADD_TODO_SUCCESS":
+        return (filter !== "complete")
+          ? [...state, action.response.result]
+          : state
       default:
         return state;
     }
