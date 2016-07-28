@@ -1,0 +1,23 @@
+{
+  "name": "sweetjs-sandbox",
+  "version": "1.0.0",
+  "description": "Playing with sweet.js",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "sjs index.sjs | node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jwhitfieldseed/sweetjs-sandbox.git"
+  },
+  "author": "Joe Whitfield-Seed <joeseed86@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwhitfieldseed/sweetjs-sandbox/issues"
+  },
+  "homepage": "https://github.com/jwhitfieldseed/sweetjs-sandbox#readme",
+  "devDependencies": {
+    "sweet.js": "^0.7.8"
+  }
+}
