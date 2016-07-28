@@ -1,4 +1,6 @@
 import { v4 as uuid } from "node-uuid";
+
+import { getIsFetching } from "../reducers";
 import * as api from '../api';
 
 // Extracting action creators documents all of the actions
@@ -20,10 +22,19 @@ export function toggleTodo(id) {
 // more powerful than a promise for an asyc action,
 // because it works with a chain of many async actions.
 export const fetchTodos = (filter) =>
-  (dispatch) => {
+
+  // The returned function can dispatch zero or more actions.
+  // If it returns a promise, components can respond to the
+  //  sequence finishing or failing.
+  (dispatch, getState) => {
+    const isFetching = getIsFetching(getState(), filter);
+    if (isFetching) {
+      return Promise.resolve();
+    }
+
     dispatch(requestTodos(filter));
 
-    api.fetchTodos(filter)
+    return api.fetchTodos(filter)
       .then(response =>
         dispatch(receiveTodos(filter, response))
       );
