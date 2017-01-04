@@ -20,3 +20,12 @@ let rec last_two = function
 assert(last_two [] = None);;
 assert(last_two ["a"] = None);;
 assert(last_two [ "a" ; "b" ; "c" ; "d"  ] = Some ("c", "d"));;
+
+(* Find the k'th element of a list. (easy) *)
+let rec at k = function
+  | [] -> None
+  | h::t -> if k = 1 then Some h else at (k-1) t;;
+
+assert(at 3 [ "a"; "b"; "c"; "d"; "e"  ] = Some "c");;
+assert(at 3 [ "a" ] = None);;
+
