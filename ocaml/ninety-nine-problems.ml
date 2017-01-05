@@ -33,10 +33,12 @@ assert(at 3 [ "a"; "b"; "c"; "d"; "e"  ] = Some "c");;
 assert(at 3 [ "a" ] = None);;
 
 (* 4. Find the number of elements of a list. (easy) *)
-let rec length : 'a list -> int
-  = function
-    | [] -> 0
-    | h::t -> 1 + (length t);;
+let length (l : 'a list) : int =
+  let rec aux l count =
+    match l with
+    | [] -> count
+    | h::t -> aux t (count + 1)
+  in aux l 0;;
 
 assert(length [ "a" ; "b" ; "c" ] = 3);;
 assert(length [] = 0);;
