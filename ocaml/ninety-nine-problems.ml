@@ -75,3 +75,19 @@ let flatten l =
 
 let flattened = flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ]
 in assert (flattened = ["a"; "b"; "c"; "d"; "e"]);;
+
+(* 8. Eliminate consecutive duplicates of list elements. (medium) *)
+let compress : 'a list -> 'a list = fun l ->
+  let rec aux result = function
+  | [] -> result
+  | a::[] -> a::result
+  | a::b::t ->
+    if a = b then
+      aux result (b::t)
+    else
+      aux (a::result) (b::t)
+  in List.rev (aux [] l);;
+
+let compressed = compress ["a";"a";"a";"a";"b";"c";"c";"c";"c";"c";"a";"a";"d";"e";"e";"e";"e"]
+(* in print_string (String.concat " " compressed);; *)
+in assert (compressed = ["a"; "b"; "c"; "a"; "d"; "e"]);;
