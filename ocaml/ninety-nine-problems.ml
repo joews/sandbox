@@ -33,6 +33,7 @@ assert(at 3 [ "a"; "b"; "c"; "d"; "e"  ] = Some "c");;
 assert(at 3 [ "a" ] = None);;
 
 (* 4. Find the number of elements of a list. (easy) *)
+(* trying out the explicit argument annotation syntax, rathern than fun (compare with #3) *)
 let length (l : 'a list) : int =
   let rec aux l count =
     match l with
@@ -42,3 +43,13 @@ let length (l : 'a list) : int =
 
 assert(length [ "a" ; "b" ; "c" ] = 3);;
 assert(length [] = 0);;
+
+(* 5. Reverse a list. (easy) *)
+let rec reverse : 'a list -> 'a list = fun l ->
+  let rec aux l reversed =
+    match l with
+    | [] -> reversed
+    | h::t -> aux t (h::reversed)
+  in aux l [];;
+
+assert (reverse [1; 2; 3] = [3; 2; 1]);;
