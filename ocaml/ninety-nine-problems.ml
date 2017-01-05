@@ -53,3 +53,25 @@ let rec reverse : 'a list -> 'a list = fun l ->
   in aux l [];;
 
 assert (reverse [1; 2; 3] = [3; 2; 1]);;
+
+(* 6. Find out whether a list is a palindrome. (easy) *)
+let is_palindrome l =
+  l = reverse l;;
+
+assert (is_palindrome [1; 2; 3; 2; 1]);;
+assert (is_palindrome [1; 2; 3] = false);;
+
+(*7. Flatten a nested list structure. (medium) *)
+type 'a node =
+  | One of 'a
+  | Many of 'a node list;;
+
+let flatten l =
+  let rec aux flat = function
+    | [] -> flat
+    | One x :: t -> aux (x::flat) t
+    | Many xs :: t -> aux (aux flat xs) t
+  in List.rev (aux [] l);;
+
+let flattened = flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ]
+in assert (flattened = ["a"; "b"; "c"; "d"; "e"]);;
