@@ -81,11 +81,11 @@ let compress : 'a list -> 'a list = fun l ->
   let rec aux result = function
   | [] -> result
   | a::[] -> a::result
-  | a::b::t ->
+  | a::(b::_ as t) ->
     if a = b then
-      aux result (b::t)
+      aux result t
     else
-      aux (a::result) (b::t)
+      aux (a::result) t
   in List.rev (aux [] l);;
 
 let compressed = compress ["a";"a";"a";"a";"b";"c";"c";"c";"c";"c";"a";"a";"d";"e";"e";"e";"e"]
