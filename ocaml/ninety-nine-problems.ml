@@ -22,7 +22,7 @@ assert(last_two [] = None);;
 assert(last_two ["a"] = None);;
 assert(last_two [ "a" ; "b" ; "c" ; "d"  ] = Some ("c", "d"));;
 
-(* Find the k'th element of a list. (easy) *)
+(* 3. Find the k'th element of a list. (easy) *)
 let rec at : int -> 'a list -> 'a option
   = fun k l ->
     match l with
@@ -32,3 +32,11 @@ let rec at : int -> 'a list -> 'a option
 assert(at 3 [ "a"; "b"; "c"; "d"; "e"  ] = Some "c");;
 assert(at 3 [ "a" ] = None);;
 
+(* 4. Find the number of elements of a list. (easy) *)
+let rec length : 'a list -> int
+  = function
+    | [] -> 0
+    | h::t -> 1 + (length t);;
+
+assert(length [ "a" ; "b" ; "c" ] = 3);;
+assert(length [] = 0);;
