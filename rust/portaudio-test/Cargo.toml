@@ -1,0 +1,7 @@
+[package]
+name = "portaudio-test"
+version = "0.1.0"
+authors = ["Joe Whitfield-Seed <joe.ws@ripjar.com>"]
+
+[dependencies]
+portaudio = "0.7.0"
