@@ -2,11 +2,10 @@
 // run the syscalls from syscall_native.c from a static buffer
 #include <stdio.h>
 
-// WORKING
-// * exit is called, and the process exits with the right code
+// Attempt to run shellcode from the data segment
+// TODO Doesn't print because the relative jump from %esp isn't valid
+// after control has left f().
 
-// TODO
-// * write doesn't write anything - check %ebp-4 is the right address
 
 // Get hex representation of syscall_inline.c from gdb
 // `disas f` to find the inline asm, then print each address:
@@ -19,9 +18,10 @@
 // overflow - we just point main's return pointer at the start of the
 // static shellcode. Static memory is executable.
 const char shellcode[] =
-  // print %ebp-4
-  // "\xb8\x04\x00\x00\x00\xbb\x01\x00\x00\x00\x8b"
-  //"\x4d\xfc\xba\x03\x00\x00\x00\xcd\x80"
+  // print s. Not working right now because I don't know the address
+  // of s after f() has returned
+  "\xb8\x04\x00\x00\x00\xbb\x01\x00\x00\x00\x8b"
+  "\x4c\x24\xfc\xba\x03\x00\x00\x00\xcd\x80"
 
   // exit 255
   // (code is the first byte on the second line)
@@ -29,9 +29,9 @@ const char shellcode[] =
   "\xff\x00\x00\x00\xcd\x80";
 
 void f() {
-  // char s[] = "hello";
+  char s[] = "hi";
   int *ret;
-  ret = (int*)&ret + 2;
+  ret = (int*)&ret + 3;
   (*ret) = (int)shellcode;
 }
 
