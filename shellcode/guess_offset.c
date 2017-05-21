@@ -25,7 +25,7 @@
 // > ./target $EGG
 //
 // target (from stack_overflow_target.c) can be exploited with:
-// > ./guess_offset 600 1048
+// > ./guess_offset 600 1640
 #define DEFAULT_OFFSET      0
 #define DEFAULT_BUFFER_SIZE 512
 
