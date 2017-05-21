@@ -3,8 +3,16 @@ FROM 32bit/debian
 RUN apt-get update
 RUN apt-get -y install build-essential gdb
 
-RUN mkdir /host
-RUN echo "echo 0 > /proc/sys/kernel/randomize_va_space" > .bash_profile
-RUN echo "cd /host" > .bash_profile
+ARG user=joe
+ARG group=joe
+ARG uid=1000
+ARG gid=991
+
+RUN groupadd -g ${gid} ${group} \
+    && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user}
+
+VOLUME /host
+
+USER ${user}
 
 ENTRYPOINT /bin/bash
