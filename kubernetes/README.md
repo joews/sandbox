@@ -37,6 +37,12 @@ curl $(minikube service hello-minikube --url)
 # open the kubernetes dashboard
 minikube dashboard
 
+# run an example job to completion
+kubectl create -f ./job.yaml
+
+# check the job status
+kubectl describe jobs/pi
+
 # stop the cluster
 minikube stop
 ```
