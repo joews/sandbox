@@ -16,7 +16,7 @@ unit f = (f, "")
 
 -- Exercise 3: define lift to create a "debuggable" function
 lift :: (Float -> Float) -> (Float -> (Float, String))
-lift f = \x -> unit (f x)
+lift f = unit . f
 
 main =
  let (_, composed_debug) = bind times2 (inc 1)
