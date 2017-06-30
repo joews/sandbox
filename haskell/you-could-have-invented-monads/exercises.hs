@@ -10,7 +10,14 @@ times2 x = (2 * x, "called times2")
 inc :: Float -> (Float, String)
 inc x = (1 + x, "called inc")
 
+-- Exercise 2: define unit to create a "debuggable" value
+unit :: Float -> (Float, String)
+unit f = (f, "")
+
+-- Exercise 3: define lift to create a "debuggable" function
+lift :: (Float -> Float) -> (Float -> (Float, String))
+lift f = \x -> unit (f x)
 
 main =
-  let (_, composed_debug) = bind times2 (inc 1)
-  in putStrLn composed_debug
+ let (_, composed_debug) = bind times2 (inc 1)
+ in putStrLn composed_debug
