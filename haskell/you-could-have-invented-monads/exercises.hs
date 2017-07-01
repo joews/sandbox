@@ -19,15 +19,14 @@ unit f = (f, "")
 lift :: (Float -> Float) -> (Float -> (Float, String))
 lift f = unit . f
 
--- Exercise 3: show that lift f' * lift g' = lift (f'.g')
+-- Exercise 3: show that lift f * lift g = lift (f.g)
 -- a*b is defined to be bind a.b
 --
--- * bind lift f' -- "a function that can be called with a debuggable result to get a combined debuggable result"
--- * bind lift f' . g' -- "a function that can be called with the input to g' to get a combined debuggable result"
--- * f' . g' -- "a "
--- so:
--- TODO with pen and paper
---
+-- * bind lift f -- "a function that can be called with a debuggable result to get a combined debuggable result"
+-- * bind lift f . g -- "a function that can be called with the input to g to get a combined debuggable result"
+-- * f . g -- "a function that calls g then f"
+-- * lift f.g -- "a debuggable function that calls g then f with default debugging output"
+
 
 f :: Float -> Float
 f x = x + 1
@@ -50,9 +49,12 @@ test_lift = hspec $ do
 test_identity = hspec $ do
   describe "lift f * lift g = lift (f.g)" $ do
     it "describes the relation between bind and lift" $ do
-      let lhs = bind (lift f) . (lift g)
+      let f' = lift f
+          g' = lift g
+          lhs = bind f' . g'
           rhs = lift (f.g)
-      (bind (lift f) ((lift g) 1)) `shouldBe` (3, "")
+      (bind f' (g' 1)) `shouldBe` (3, "")
+      (f.g) 1 `shouldBe` 3
       (lhs 1) `shouldBe` (3, "")
       (rhs 1) `shouldBe` (lhs 1)
 
