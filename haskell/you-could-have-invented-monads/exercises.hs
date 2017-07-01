@@ -24,6 +24,9 @@ lift f = unit . f
 -- so:
 -- bind (lift f) . (lift g) = lift (f.g)
 
+-- Run as unit tests
+-- The $ operator avoids parentheses. Code after it has higher precendence
+-- than code before it.
 main = hspec $ do
   describe "bind" $ do
     it "composes 'debuggable' functions" $ do
