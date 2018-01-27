@@ -26,7 +26,19 @@ struct termios orig_termios;
 // terminal handling
 //
 
+void clearScreen() {
+  // clear the screen
+  // J: erase command
+  // 2: erase command arg: clear the whole screen
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+
+  // move cursor to top left
+  write(STDOUT_FILENO, "\x1b[H", 3);
+}
+
 void die(const char *s) {
+  clearScreen();
+
   // print a standard error message for the global `errno`,
   // which is populated by built in functions on error
   perror(s);
@@ -82,6 +94,7 @@ void enableRawMode() {
   }
 }
 
+// debug helper
 void echoKey(char c) {
   if (iscntrl(c)) {
     printf("%d\r\n", c);
@@ -104,18 +117,40 @@ char editorReadKey() {
   return c;
 }
 
-// handle user input
+//
+// input
+//
+
 void editorProcessKeypress() {
   char c = editorReadKey();
 
   switch (c) {
     case CTRL_KEY('q'):
+      clearScreen();
       exit(0);
       break;
     default:
       echoKey(c);
   }
 
+}
+
+//
+// output
+//
+
+void editorDrawRows() {
+  int y;
+  for (y = 0; y < 24; y++) {
+    write(STDOUT_FILENO, "~\r\n", 3);
+  }
+}
+
+void editorRefreshScreen() {
+  clearScreen();
+  editorDrawRows();
+
+  write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 //
@@ -127,6 +162,7 @@ int main() {
 
   // polll stdin for keystrokes
   while(1) {
+    editorRefreshScreen();
     editorProcessKeypress();
   }
 
