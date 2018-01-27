@@ -11,6 +11,10 @@
 // with help from https://viewsourcecode.org/snaptoken/kilo/index.html
 //
 
+// ASCII control characters, like uppercase chars, are a bitmask away
+// from the lowercase characters.
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 //
 // state
 //
@@ -78,6 +82,42 @@ void enableRawMode() {
   }
 }
 
+void echoKey(char c) {
+  if (iscntrl(c)) {
+    printf("%d\r\n", c);
+  } else {
+    printf("%c (%d)\r\n", c, c);
+  }
+}
+
+// read a single key input, blocking until that happens
+char editorReadKey() {
+  int nread;
+  char c;
+
+  while((nread = read(STDIN_FILENO, &c, 1)) != 1) {
+    if (nread == -1 && errno != EAGAIN) {
+      die("read");
+    }
+  }
+
+  return c;
+}
+
+// handle user input
+void editorProcessKeypress() {
+  char c = editorReadKey();
+
+  switch (c) {
+    case CTRL_KEY('q'):
+      exit(0);
+      break;
+    default:
+      echoKey(c);
+  }
+
+}
+
 //
 // init
 //
@@ -87,19 +127,7 @@ int main() {
 
   // polll stdin for keystrokes
   while(1) {
-  char c = '\0';
-  if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) {
-    die("read");
-  }
-    if (iscntrl(c)) {
-      printf("%d\r\n", c);
-    } else {
-      printf("%c (%d)\r\n", c, c);
-    }
-
-    if (c == 'q') {
-      break;
-    }
+    editorProcessKeypress();
   }
 
   return 0;
