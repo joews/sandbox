@@ -21,7 +21,6 @@
 // ASCII control characters, like uppercase chars, are a bitmask away
 // from the lowercase characters.
 #define CTRL_KEY(k) ((k) & 0x1f)
-
 #define KILO_VERSION "0.0.1"
 
 enum editorKey {
@@ -280,7 +279,7 @@ void editorOpen(char *filename) {
   }
 
   free(line);
-  E.numrows = 1;
+  fclose(fp);
 }
 
 //
@@ -380,7 +379,6 @@ void editorDrawRows(abuf *ab) {
   for (y = 0; y < E.screenrows; y++) {
     // lines with no content: show a tilde/welcome message
     if (y >= E.numrows) {
-
       // draw a welcome message (unless we've opened a file)
       if (E.numrows == 0 && E.screenrows / 3) {
         char welcome[80];
