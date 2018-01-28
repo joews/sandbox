@@ -19,11 +19,22 @@
 
 #define KILO_VERSION "0.0.1"
 
+enum editorKey {
+  ARROW_LEFT = 1000,
+  ARROW_RIGHT,
+  ARROW_UP,
+  ARROW_DOWN
+};
+
 //
 // state
 //
 
 typedef struct editorConfig {
+  // cursor position
+  int cx, cy;
+
+  // screen dimensions
 	int screenrows;
 	int screencols;
 
@@ -115,7 +126,7 @@ void echoKey(char c) {
 }
 
 // read a single key input, blocking until that happens
-char editorReadKey() {
+int editorReadKey() {
   int nread;
   char c;
 
@@ -125,7 +136,29 @@ char editorReadKey() {
     }
   }
 
-  return c;
+  // escape sequence: check for arrow keys
+  if (c == '\x1b') {
+    char seq[3];
+
+    // check for the full escape sequence within the read timeout
+    // if we don't get it, assume the user just pressed escape.
+    if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
+    if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+
+    // arrow keys send [A-D
+    if (seq[0] == '[') {
+      switch (seq[1]) {
+        case 'A': return ARROW_UP;
+        case 'B': return ARROW_DOWN;
+        case 'C': return ARROW_RIGHT;
+        case 'D': return ARROW_LEFT;
+      }
+    }
+
+    return '\x1b';
+  } else {
+    return c;
+  }
 }
 
 int getCursorPosition(int *rows, int *cols) {
@@ -186,18 +219,47 @@ void abFree(struct abuf *ab) {
 }
 
 //
-
-
 // input
 //
 
+void editorMoveCursor(int key) {
+  switch (key) {
+    case ARROW_LEFT:
+      if (E.cx != 0) {
+        E.cx--;
+      }
+      break;
+    case ARROW_RIGHT:
+      if (E.cx != E.screencols - 1) {
+        E.cx++;
+      }
+      break;
+    case ARROW_UP:
+      if (E.cy != 0) {
+        E.cy--;
+      }
+      break;
+    case ARROW_DOWN:
+      if (E.cy != E.screenrows - 1) {
+        E.cy++;
+      }
+      break;
+  }
+}
+
 void editorProcessKeypress() {
-  char c = editorReadKey();
+  int c = editorReadKey();
 
   switch (c) {
     case CTRL_KEY('q'):
       clearScreen();
       exit(0);
+      break;
+    case ARROW_UP:
+    case ARROW_DOWN:
+    case ARROW_LEFT:
+    case ARROW_RIGHT:
+      editorMoveCursor(c);
       break;
     default:
       echoKey(c);
@@ -248,14 +310,17 @@ void editorDrawRows(abuf *ab) {
 void editorRefreshScreen() {
   struct abuf ab = ABUF_INIT;
 
-
   abAppend(&ab, "\x1b[?25l", 6);  // hide cursor
   abAppend(&ab, "\x1b[H", 3);     // cursor top left
 
   editorDrawRows(&ab);
 
+  // move the cursor to the position in E.cx|y
+  // (terminal row/cols are 1-indexed)
+  char buf[32];
+  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+  abAppend(&ab, buf, strlen(buf));
 
-  abAppend(&ab, "\x1b[H", 3);     // cursor top left
   abAppend(&ab, "\x1b[?25h", 6);  // show cursor
   write(STDOUT_FILENO, ab.b, ab.len);
   abFree(&ab);
@@ -265,6 +330,9 @@ void editorRefreshScreen() {
 // init
 //
 void initEditor() {
+  E.cx = 0;
+  E.cy = 0;
+
   if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
 
