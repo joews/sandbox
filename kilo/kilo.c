@@ -45,6 +45,7 @@ typedef struct erow {
   char *chars;
 } erow;
 
+// the editor's state
 typedef struct editorConfig {
   // cursor position
   int cx, cy;
@@ -52,6 +53,9 @@ typedef struct editorConfig {
   // screen dimensions
 	int screenrows;
 	int screencols;
+
+  // the row we are scrolled to
+  int rowoff;
 
   int numrows;
   erow *row;
@@ -328,7 +332,7 @@ void editorMoveCursor(int key) {
       }
       break;
     case ARROW_DOWN:
-      if (E.cy != E.screenrows - 1) {
+      if (E.cy < E.numrows) {
         E.cy++;
       }
       break;
@@ -374,11 +378,25 @@ void editorProcessKeypress() {
 // output
 //
 
+// check if the cursor has moved outside the viewport.
+// if so, scroll the view.
+void editorScroll() {
+  if (E.cy < E.rowoff) {
+    E.rowoff = E.cy;
+  }
+
+  if (E.cy >= E.rowoff + E.screenrows) {
+    E.rowoff = E.cy - E.screenrows + 1;
+  }
+}
+
 void editorDrawRows(abuf *ab) {
   int y;
   for (y = 0; y < E.screenrows; y++) {
+    int filerow = y + E.rowoff;
+
     // lines with no content: show a tilde/welcome message
-    if (y >= E.numrows) {
+    if (filerow >= E.numrows) {
       // draw a welcome message (unless we've opened a file)
       if (E.numrows == 0 && E.screenrows / 3) {
         char welcome[80];
@@ -403,9 +421,9 @@ void editorDrawRows(abuf *ab) {
       }
     } else {
       // lines with content: render it!
-      int len = E.row[y].size;
+      int len = E.row[filerow].size;
       if (len > E.screencols) len = E.screencols;
-      abAppend(ab, E.row[y].chars, len);
+      abAppend(ab, E.row[filerow].chars, len);
     }
 
     abAppend(ab, "\x1b[K", 3); // clear line
@@ -419,6 +437,8 @@ void editorDrawRows(abuf *ab) {
 // write screen updates to an appendable buffer and write
 // in a single `write` call to avoid flicker
 void editorRefreshScreen() {
+   editorScroll();
+
   struct abuf ab = ABUF_INIT;
 
   abAppend(&ab, "\x1b[?25l", 6);  // hide cursor
@@ -429,7 +449,7 @@ void editorRefreshScreen() {
   // move the cursor to the position in E.cx|y
   // (terminal row/cols are 1-indexed)
   char buf[32];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy - E.rowoff + 1, E.cx + 1);
   abAppend(&ab, buf, strlen(buf));
 
   abAppend(&ab, "\x1b[?25h", 6);  // show cursor
@@ -443,6 +463,7 @@ void editorRefreshScreen() {
 void initEditor() {
   E.cx = 0;
   E.cy = 0;
+  E.rowoff = 0;
   E.numrows = 0;
   E.row = NULL;
 
