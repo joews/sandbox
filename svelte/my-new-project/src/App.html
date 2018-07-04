@@ -1,0 +1,38 @@
+<svelte:head>
+	<title>Svelte!</title>
+</svelte:head>
+
+<h1>Hello {nameUpper}!</h1>
+<p>
+	{#await promise}
+	<p>Loading...</p>
+	{:then answer}
+	<p>{answer}</p>
+	{:catch error}
+	<p>oops</p>
+	{/await}
+</p>
+
+<style>
+	h1 {
+		color: purple;
+	}
+
+	.unused {
+		color: red;
+	}
+</style>
+
+<script>
+	export default {
+		data() {
+			return {
+				name: "default, if that is your real name"
+			}
+		},
+
+		computed: {
+			nameUpper: ({ name }) => name.toUpperCase()
+		}
+	}
+</script>
